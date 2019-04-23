@@ -36,7 +36,8 @@ $(document).ready(function() {
 		    		elMsg.addClass("alert-success");
 		    		elMsg.removeClass("alert-danger");
 		    		$.redirect(window.location.href + 'index.php', {
-				    	page: 'clients.twig'
+				    	page: 'clients.twig',
+				    	title: 'Clients'
 				    });
 		    	} else {
 		    		elMsg.addClass("alert-danger");

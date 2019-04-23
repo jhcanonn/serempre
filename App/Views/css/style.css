@@ -11,3 +11,7 @@ body {
 .login-bkg {
 	background-image: url("../img/img-back-login.jpg");
 }
+
+#clients thead, th {
+	text-align: center;
+}

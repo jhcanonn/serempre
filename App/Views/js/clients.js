@@ -1,8 +1,13 @@
 $(document).ready(function() {
 	// Pagination Table
-    $('#example').DataTable({
-    	scrollY: '50vh',
+    $('#clients').DataTable({
+    	scrollY: '45vh',
         scrollCollapse: true,
-        paging: true
+        paging: true,
+        responsive: true
     });
+
+
+
+
 });
