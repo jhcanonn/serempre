@@ -30,14 +30,18 @@ $(document).ready(function() {
 		    type: $(this).attr('method'),
 		    url: $(this).attr('action'),
 		    data: formData,
-		    success: function(data) {
-		    	var obj = JSON.parse(data);
+		    success: function(response) {
+		    	var obj = JSON.parse(response);
+		    	var aData = {
+		    		title : 'Clients',
+		    		cities : obj.cities
+		    	};
 		    	if(obj.success) {
 		    		elMsg.addClass("alert-success");
 		    		elMsg.removeClass("alert-danger");
 		    		$.redirect(window.location.href + 'index.php', {
 				    	page: 'clients.twig',
-				    	title: 'Clients'
+				    	data: aData
 				    });
 		    	} else {
 		    		elMsg.addClass("alert-danger");
@@ -45,7 +49,6 @@ $(document).ready(function() {
 		    	}
 		    	elMsg.text(obj.msg);
 		    	elMsg.show();
-		    	console.log(obj);
 		    }
 		})
 	});

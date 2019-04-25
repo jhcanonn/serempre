@@ -25,7 +25,7 @@
     </table>
     <br>
     <div class="d-flex justify-content-center">
-        <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#addClient">Add client</button>
+        <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#addClient" id="add-client">Add client</button>
     </div>
 </div>
 
@@ -40,7 +40,8 @@
         </button>
       </div>
       <div class="modal-body">
-        <form action="#" method="post" id="create-client">
+        <form action="App/Controllers/HandlerController.php" method="post" id="form-client">
+            <input type="hidden" name="method" value="create_client">
             <div class="form-group">
                 <label for="code" class="font-weight-bold">Code</label>
                 <input type="text" class="form-control" id="code" placeholder="Code" name="code">
@@ -51,11 +52,10 @@
             </div>
             <div class="form-group">
                 <label for="city" class="font-weight-bold">City</label>
-                <select class="custom-select" id="city">
-                    <option selected>Open this select menu</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
+                <select class="custom-select" id="city" name="city">
+                    {% for city in data.cities %}
+                        <option value="{{ city.id|e }}">{{ city.name|e }}</option>
+                    {% endfor %}
                 </select>
             </div>
         </form>

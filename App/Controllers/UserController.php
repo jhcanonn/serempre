@@ -4,11 +4,11 @@ namespace App\Controllers;
 
 require_once "../../vendor/autoload.php";
 
-use App\Models\{UserModel};
+use App\Models\{UserModel, CityModel};
 
 class UserController {
 
-	protected $msg = array('success' => '', 'msg' => '');
+	protected $msg = array('success' => false, 'msg' => '', 'cities' => '');
 
 	public function verifyUser($username, $password) {
 		$user = UserModel::where('username', '=', $username)->first();
@@ -17,12 +17,11 @@ class UserController {
 			if($verify) {
 				$this->msg['success'] = true;
 				$this->msg['msg'] = "Credenciales correctas.";
+				$this->msg['cities'] = $this->getCities();
 			} else {
-				$this->msg['success'] = false;
 				$this->msg['msg'] = "Credenciales incorrectas.";
 			}
 		} else {
-			$this->msg['success'] = false;
 			$this->msg['msg'] = "Usuario no se encuentra registrado.";
 		}
 		return json_encode($this->msg);
@@ -37,11 +36,15 @@ class UserController {
 			$user->save();
 			$this->msg['success'] = true;
 			$this->msg['msg'] = "Usuario registrado con éxito.";
+			$this->msg['cities'] = $this->getCities();
 		} else {
-			$this->msg['success'] = false;
 			$this->msg['msg'] = "Usuario ya se encuentra registrado.";
 		}
 		return json_encode($this->msg);
+	}
+
+	private function getCities() {
+		return CityModel::all();
 	}
 
 }

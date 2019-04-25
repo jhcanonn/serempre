@@ -5,7 +5,7 @@ namespace App\Controllers;
 require_once "../../vendor/autoload.php";
 
 use App\Models\{Database};
-use App\Controllers\{UserController};
+use App\Controllers\{UserController, ClientController};
 
 new Database();
 
@@ -17,6 +17,10 @@ switch ($_POST['method']) {
 	case 'singup':
 		$user = new UserController();
 		echo $user->registerUser($_POST['username'], $_POST['password']);
+		break;
+	case 'create_client':
+		$client = new ClientController();
+		echo $client->addClient($_POST['code'], $_POST['name'], $_POST['city']);
 		break;
 	
 	default:
