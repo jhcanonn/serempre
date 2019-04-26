@@ -32,17 +32,10 @@ $(document).ready(function() {
 		    data: formData,
 		    success: function(response) {
 		    	var obj = JSON.parse(response);
-		    	var aData = {
-		    		title : 'Clients',
-		    		cities : obj.cities
-		    	};
 		    	if(obj.success) {
 		    		elMsg.addClass("alert-success");
 		    		elMsg.removeClass("alert-danger");
-		    		$.redirect(window.location.href + 'index.php', {
-				    	page: 'clients.twig',
-				    	data: aData
-				    });
+		    		$.redirect(window.location.href);
 		    	} else {
 		    		elMsg.addClass("alert-danger");
 		    		elMsg.removeClass("alert-success");

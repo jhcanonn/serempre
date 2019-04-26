@@ -1,16 +1,18 @@
 <?php
 
+session_start();
+
 require_once "vendor/autoload.php";
 
 use App\Controllers\{ViewController};
 
-if(!isset($_POST['page'])) {
-	$_POST['page'] = 'login.twig';
-	$_POST['data'] = array('title' => 'Login');
-}
+if(!isset($_SESSION['page']) || !isset($_SESSION['data'])) {
+	$_SESSION['page'] = 'login.twig';
+	$_SESSION['data'] = array('title' => 'Login');
+} 
 
 $view = new ViewController();
-$renderedView = $view->rederView($_POST['page'], [
-	'data' => $_POST['data']
+$renderedView = $view->rederView($_SESSION['page'], [
+	'data' => $_SESSION['data']
 ]);
 echo $renderedView;

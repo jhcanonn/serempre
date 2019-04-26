@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+session_start();
+
 require_once "../../vendor/autoload.php";
 
 use App\Models\{Database};
@@ -17,6 +19,9 @@ switch ($_POST['method']) {
 	case 'singup':
 		$user = new UserController();
 		echo $user->registerUser($_POST['username'], $_POST['password']);
+		break;
+	case 'logout':
+		session_destroy();
 		break;
 	case 'create_client':
 		$client = new ClientController();

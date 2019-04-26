@@ -41,4 +41,13 @@ $(document).ready(function() {
 		})
 	});
 
+    var logoutEl = $("a#logout");
+    logoutEl.click(function() {
+        $.ajax({
+            type: "POST",
+            url: "App/Controllers/HandlerController.php",
+            data: $.param({method: 'logout'})
+        })
+    });
+
 });
