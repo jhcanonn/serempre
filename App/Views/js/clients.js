@@ -1,8 +1,9 @@
 $(document).ready(function() {
+
 	// Paginacion de la tabla Clientes
     var tableclientEl = $("#clients");
     var clientDataTable = tableclientEl.DataTable({
-        scrollY: "45vh",
+        scrollY: "40vh",
         scrollX: true,
         scrollCollapse: true,
         paging: true,
@@ -67,8 +68,36 @@ $(document).ready(function() {
     	formClientEl.submit();
     });
 
+    setValidationClientForm(clientDataTable);
+
+    // Justo antes de que se cierra el modal
+    $('#addClient').on('hide.bs.modal', function() {
+        // Resetea campos del formulario
+        $(this).find('form').trigger("reset");
+        // Resetea campo de city
+        $("#city option").attr('selected', false);          
+        $('#city option:contains("Select")').attr('selected', true);
+        // Desmarca que fueron validados
+        $(this).find('form').data('bootstrapValidator').resetForm();
+    });
+
+    // Despues de que se abre el modal
+    $('#addClient').on('shown.bs.modal', function() {
+        $('#code').trigger('focus');
+    });
+
+});
+
+
+
+/**
+* Funcion que se encarga de construit un objeto de los datos de un formulario
+* @param form Elemento DOM del formulario
+* @return Objeto
+*/
+function setValidationClientForm(dataTable) {
     // Validacion del formulario para crear Cliente
-    formClientEl.bootstrapValidator({
+    $("#form-client").bootstrapValidator({
         feedbackIcons: {
             valid: 'glyphicon glyphicon-ok',
             invalid: 'glyphicon glyphicon-remove',
@@ -110,7 +139,7 @@ $(document).ready(function() {
         }
     }).on('success.form.bv', function(e) {
         // Stop the browser from submitting the form.
-        event.preventDefault();
+        e.preventDefault();
 
         // Serializa los datos del formulario
         var formData = $(this).serialize();
@@ -130,7 +159,7 @@ $(document).ready(function() {
                     // Se muestra la notificacion de exito
                     showNotification(obj.msg);
                     // Se agrega cliente a la tabla de clientes
-                    var newRow = clientDataTable.row.add([
+                    var newRow = dataTable.row.add([
                         formDataObj.code,
                         formDataObj.name,
                         $("#city option[value=" + formDataObj.city + "]").text(),
@@ -141,8 +170,7 @@ $(document).ready(function() {
             }
         })
     });
-
-});
+}
 
 /**
 * Funcion que se encarga de construit un objeto de los datos de un formulario
