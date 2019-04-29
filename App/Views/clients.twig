@@ -1,70 +1,39 @@
 {% extends "base.twig" %}
 
-{% block navbar %}
-	{% include 'navbar.twig' %}
+{% block extras %}
+    {% include 'navbar.twig' %}
+    {% include 'notification.twig' %}
+	{% include 'modalAddClient.twig' %}
 {% endblock %}
 
 {% block content %}
 <br><br>
 <div class="container">
-	<table id="clients" class="table table-striped table-bordered nowrap">
+	<table id="clients" class="table table-striped table-bordered nowrap w-100">
         <thead>
             <tr>
-                <th width="20%">Code</th>
-                <th width="40%">Name</th>
-                <th width="40%">City</th>
+                <th>Code</th>
+                <th>Name</th>
+                <th>City</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>12</td>
-                <td>Jair Callejas</td>
-                <td>New York</td>
-            </tr>
+            {% for client in data.clients %}
+                <tr data-client-id="{{ client.id|e }}">
+                    <td>{{ client.code|e }}</td>
+                    <td>{{ client.name_client|e }}</td>
+                    <td>{{ client.name_city|e }}</td>
+                    <td>
+                        <a class="edit"><i class="fas fa-lg fa-edit green-text"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;<a class="delete"><i class="fas fa-lg fa-trash-alt red-text"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
     <br>
     <div class="d-flex justify-content-center">
-        <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#addClient" id="add-client">Add client</button>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addClient" id="add-client">Add client</button>
     </div>
-</div>
-
-<!-- Modal Add Client -->
-<div class="modal fade" id="addClient" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Create client</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form action="App/Controllers/HandlerController.php" method="post" id="form-client">
-            <input type="hidden" name="method" value="create_client">
-            <div class="form-group">
-                <label for="code" class="font-weight-bold">Code</label>
-                <input type="text" class="form-control" id="code" placeholder="Code" name="code">
-            </div>
-            <div class="form-group">
-                <label for="name" class="font-weight-bold">Name</label>
-                <input type="name" class="form-control" id="name" placeholder="Name" name="name">
-            </div>
-            <div class="form-group">
-                <label for="city" class="font-weight-bold">City</label>
-                <select class="custom-select" id="city" name="city">
-                    {% for city in data.cities %}
-                        <option value="{{ city.id|e }}">{{ city.name|e }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary">Save</button>
-      </div>
-    </div>
-  </div>
 </div>
 {% endblock %}

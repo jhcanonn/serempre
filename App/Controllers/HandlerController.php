@@ -11,6 +11,10 @@ use App\Controllers\{UserController, ClientController};
 
 new Database();
 
+if(!isset($_SESSION['username'])) {
+	$_SESSION['username'] = $_POST['username'];
+} 
+
 switch ($_POST['method']) {
 	case 'singin':
 		$user = new UserController();
@@ -26,6 +30,10 @@ switch ($_POST['method']) {
 	case 'create_client':
 		$client = new ClientController();
 		echo $client->addClient($_POST['code'], $_POST['name'], $_POST['city']);
+		break;
+	case 'delete_client':
+		$client = new ClientController();
+		echo $client->deleteClient($_POST['id']);
 		break;
 	
 	default:

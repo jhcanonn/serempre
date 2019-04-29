@@ -6,16 +6,17 @@ session_start();
 
 require_once "../../vendor/autoload.php";
 
-use App\Models\{UserModel, CityModel};
+use App\Models\{UserModel, CityModel, ClientModel};
+use Illuminate\Database\Capsule\Manager as DB;
 
 class UserController {
 
 	protected $msg = array('success' => false, 'msg' => '');
 
 	public function verifyUser($username, $password) {
-		$this->setSessionInfo();
 		$user = UserModel::where('username', '=', $username)->first();
 		if($user) {
+			$this->setSessionInfo($user->id);
 			$verify = password_verify($password, $user->password);
 			if($verify) {
 				$this->msg['success'] = true;
@@ -30,13 +31,13 @@ class UserController {
 	}
 
 	public function registerUser($username, $password) {
-		$this->setSessionInfo();
 		$exist = UserModel::where('username', '=', $username)->count();
 		if(!$exist) {
 			$user = new UserModel();
 			$user->username = $username;
 			$user->password = password_hash($password, PASSWORD_DEFAULT);
 			$user->save();
+			$this->setSessionInfo($user->id);
 			$this->msg['success'] = true;
 			$this->msg['msg'] = "Usuario registrado con éxito.";
 		} else {
@@ -45,9 +46,17 @@ class UserController {
 		return json_encode($this->msg);
 	}
 
-	private function setSessionInfo() {
+	private function setSessionInfo($userId) {
 		$_SESSION['page'] = 'clients.twig';
-		$_SESSION['data'] = array('title' => 'Client', 'cities' => CityModel::all()->toArray());
+		$_SESSION['data'] = array(
+			'title' => 'Client',
+			'cities' => CityModel::all()->toArray(),
+			'clients' => DB::table('clients')
+						->select('clients.id', 'clients.code','clients.name as name_client','cities.name as name_city')
+						->join('cities','cities.id','=','clients.city_id')
+						->where('clients.user_id', '=', $userId)
+						->get()->toArray()
+		);
 	}
 
 }

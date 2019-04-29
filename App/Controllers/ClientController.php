@@ -2,21 +2,52 @@
 
 namespace App\Controllers;
 
+session_start();
+
 require_once "../../vendor/autoload.php";
 
 use App\Models\{ClientModel, UserModel};
+use Illuminate\Database\Capsule\Manager as DB;
 
 class ClientController {
 
+	protected $msg = array('success' => true, 'msg' => '');
+
 	public function addClient($code, $name, $city) {
-		return 'aura/session';
-		// $user = UserModel::where('username', '=', $_SESSION['username'])->first();
-		// $client = new ClientModel();
-		// $client->code = $code;
-		// $client->name = $name;
-		// $client->user_id = $user->id;
-		// $client->city_id = $city;
-		// $client->save();
+		$user = UserModel::where('username', '=', $_SESSION['username'])->first();
+		if($user) {
+			$client = new ClientModel();
+			$client->code = $code;
+			$client->name = $name;
+			$client->user_id = $user->id;
+			$client->city_id = $city;
+			$client->save();
+			$this->refreshClientsOnSession($user->id);
+			$this->msg['msg'] = 'Added successfully';
+			$this->msg['clientId'] = $client->id;
+		}
+		return json_encode($this->msg);
+	}
+
+	public function deleteClient($clientId) {
+		$user = UserModel::where('username', '=', $_SESSION['username'])->first();
+		if($user) {
+			$client = ClientModel::find($clientId);
+			if($client) {
+				$client->delete();
+				$this->refreshClientsOnSession($user->id);
+				$this->msg['msg'] = 'Deleted successfully';
+			}
+		}
+		return json_encode($this->msg);
+	}
+
+	private function refreshClientsOnSession($userId) {
+		$_SESSION['data']['clients'] = DB::table('clients')
+										->select('clients.id', 'clients.code','clients.name as name_client','cities.name as name_city')
+										->join('cities','cities.id','=','clients.city_id')
+										->where('clients.user_id', '=', $userId)
+										->get()->toArray();
 	}
 
 }
