@@ -9,7 +9,8 @@
       </div>
       <div class="modal-body">
         <form action="App/Controllers/HandlerController.php" method="post" id="form-client">
-            <input type="hidden" name="method" value="create_client">
+            <input id="action-client" type="hidden" name="method" value=""> <!-- create_client or edit_client -->
+            <input id="id" type="hidden" name="id" value="">
             <div class="form-group">
                 <label for="code" class="font-weight-bold">Code</label>
                 <input type="text" class="form-control" id="code" placeholder="Code" name="code">

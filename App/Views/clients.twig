@@ -20,7 +20,10 @@
         </thead>
         <tbody>
             {% for client in data.clients %}
-                <tr data-client-id="{{ client.id|e }}">
+                <tr data-client-id="{{ client.id|e }}"
+                    data-code="{{ client.code|e }}"
+                    data-name="{{ client.name_client|e }}"
+                    data-city="{{ client.city_id|e }}">
                     <td>{{ client.code|e }}</td>
                     <td>{{ client.name_client|e }}</td>
                     <td>{{ client.name_city|e }}</td>

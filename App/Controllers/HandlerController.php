@@ -29,7 +29,11 @@ switch ($_POST['method']) {
 		break;
 	case 'create_client':
 		$client = new ClientController();
-		echo $client->addClient($_POST['code'], $_POST['name'], $_POST['city']);
+		echo $client->createClient($_POST['code'], $_POST['name'], $_POST['city']);
+		break;
+	case 'update_client':
+		$client = new ClientController();
+		echo $client->updateClient($_POST['id'], $_POST['code'], $_POST['name'], $_POST['city']);
 		break;
 	case 'delete_client':
 		$client = new ClientController();

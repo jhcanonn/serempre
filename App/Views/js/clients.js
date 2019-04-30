@@ -1,8 +1,20 @@
 $(document).ready(function() {
+    var clientDataTable = setDataTable();
+    setListenerRowAction(clientDataTable);
+    setListenerChangeCity();
+    setListenerClickLogout();
+    setListenerAddClient();
+    setListenerSaveClientForm();
+    setValidationClientForm(clientDataTable);
+    setEventsCreateClientModal();
+});
 
-	// Paginacion de la tabla Clientes
-    var tableclientEl = $("#clients");
-    var clientDataTable = tableclientEl.DataTable({
+/**
+* Funcion que se encarga de configurar DataTable de la tabla cliente
+* @return Devuelve elemento datatable
+*/
+function setDataTable() {
+    var dataTable = $("#clients").DataTable({
         scrollY: "40vh",
         scrollX: true,
         scrollCollapse: true,
@@ -13,11 +25,20 @@ $(document).ready(function() {
         ]
     });
     $('.dataTables_length').addClass('bs-select');
+    return dataTable;
+}
+
+/**
+* Funcion que se encarga de configurar los listener de edit y delete de la fila
+* @param dataTable Elemento DOM del datatable configurado
+*/
+function setListenerRowAction(dataTable) {
+    var tableclientEl = $("#clients");
 
     // Se configura listener para click en eliminar
     tableclientEl.on('click', '.delete', function() {
         var currentRow = $(this).closest('tr');
-        clientDataTable.row(currentRow).remove().draw();
+        dataTable.row(currentRow).remove().draw();
         // Ajax para eliminar cliente de la base de datos
         $.ajax({
             type: "POST",
@@ -36,13 +57,22 @@ $(document).ready(function() {
     // Se configura listener para click en editar
     tableclientEl.on('click', '.edit', function() {
         var currentRow = $(this).closest('tr');
-        console.log(currentRow.data('clientId'));
+        var formClientEl = $("#form-client");
+        $('#action-client').val('update_client');
+        $('#addClient').modal('show');
+        formClientEl.find('#id').val(currentRow.data('clientId'));
+        formClientEl.find('#code').val(currentRow.data('code'));
+        formClientEl.find('#name').val(currentRow.data('name'));
+        formClientEl.find('#city').val(currentRow.data('city')).trigger('change');
     });
+}
 
-    // Se configura listener del campo ciudad
-    var citiesEl = $("#city");
-    citiesEl.change(function() {
-    	var optionId = $(this).val();
+/**
+* Funcion que se encarga de configurar listener para seleccionar ciudad
+*/
+function setListenerChangeCity() {
+    $("#city").change(function() {
+        var optionId = $(this).val();
         $("#city option").attr('selected', false);
         if(optionId) {
             $("#city option[value=" + optionId + "]").attr('selected', true); 
@@ -50,50 +80,44 @@ $(document).ready(function() {
             $('#city option:contains("Select")').attr('selected', true); 
         }
     });
-    
-    // Ajax para Logout
-    var logoutEl = $("a#logout");
-    logoutEl.click(function() {
+}
+
+/**
+* Funcion que se encarga de configurar listener para agregar cliente
+*/
+function setListenerAddClient() {
+    $('#add-client').click(function() {
+        $('#action-client').val('create_client');
+    });
+}
+
+/**
+* Funcion que se encarga de configurar listener para Logout
+*/
+function setListenerClickLogout() {
+    $("a#logout").click(function() {
         $.ajax({
             type: "POST",
             url: "App/Controllers/HandlerController.php",
             data: $.param({method: 'logout'})
         })
     });
-
-    // Se dispara el submit del formulario cliente cuando se de click en Save
-    var formClientEl = $("#form-client");
-    var saveEl = $("#addClient .modal-footer .btn-primary");
-    saveEl.click(function() {
-    	formClientEl.submit();
-    });
-
-    setValidationClientForm(clientDataTable);
-
-    // Justo antes de que se cierra el modal
-    $('#addClient').on('hide.bs.modal', function() {
-        // Resetea campos del formulario
-        $(this).find('form').trigger("reset");
-        // Resetea campo de city
-        $("#city option").attr('selected', false);          
-        $('#city option:contains("Select")').attr('selected', true);
-        // Desmarca que fueron validados
-        $(this).find('form').data('bootstrapValidator').resetForm();
-    });
-
-    // Despues de que se abre el modal
-    $('#addClient').on('shown.bs.modal', function() {
-        $('#code').trigger('focus');
-    });
-
-});
-
-
+}
 
 /**
-* Funcion que se encarga de construit un objeto de los datos de un formulario
-* @param form Elemento DOM del formulario
-* @return Objeto
+* Funcion que se encarga de configurar listener para Save de crear cliente
+*/
+function setListenerSaveClientForm() {
+    // Se dispara el submit del formulario cliente cuando se de click en Save
+    var saveEl = $("#addClient .modal-footer .btn-primary");
+    saveEl.click(function() {
+        $("#form-client").submit();
+    });
+}
+
+/**
+* Funcion que se encarga de construir un objeto de los datos de un formulario
+* @param dataTable Elemento DOM del datatable configurado
 */
 function setValidationClientForm(dataTable) {
     // Validacion del formulario para crear Cliente
@@ -158,6 +182,11 @@ function setValidationClientForm(dataTable) {
                     $('#addClient').modal('hide');
                     // Se muestra la notificacion de exito
                     showNotification(obj.msg);
+                    // Si se va a actualizar registro se elimina para posteriormente agregarse
+                    if(obj.update) {
+                        var currentRow = $('#clients').find('tbody tr[data-client-id="' + obj.clientId + '"]');
+                        dataTable.row(currentRow).remove().draw();
+                    }
                     // Se agrega cliente a la tabla de clientes
                     var newRow = dataTable.row.add([
                         formDataObj.code,
@@ -165,7 +194,11 @@ function setValidationClientForm(dataTable) {
                         $("#city option[value=" + formDataObj.city + "]").text(),
                         $('<td><a class="edit"><i class="fas fa-lg fa-edit green-text"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;<a class="delete"><i class="fas fa-lg fa-trash-alt red-text"></i></a></td>').html()
                     ]).draw().node();
+                    // Se configuran data-* sobre el elemento tr de la tabla clientes
                     $(newRow).attr('data-client-id', obj.clientId);
+                    $(newRow).attr('data-code', formDataObj.code);
+                    $(newRow).attr('data-name', formDataObj.name);
+                    $(newRow).attr('data-city', formDataObj.city);
                 }
             }
         })
@@ -173,7 +206,30 @@ function setValidationClientForm(dataTable) {
 }
 
 /**
-* Funcion que se encarga de construit un objeto de los datos de un formulario
+* Funcion que se encarga de configurar eventos del Modal de creacion de cliente
+*/
+function setEventsCreateClientModal() {
+    var addClientEl = $('#addClient');
+    // Justo antes de que se cierra el modal
+    addClientEl.on('hide.bs.modal', function() {
+        // Resetea campos del formulario
+        $(this).find('form').trigger("reset");
+        $(this).find('form').find('#id').val('');
+        // Resetea campo de city
+        $("#city option").attr('selected', false);          
+        $('#city option:contains("Select")').attr('selected', true);
+        // Desmarca que fueron validados
+        $(this).find('form').data('bootstrapValidator').resetForm();
+    });
+
+    // Despues de que se abre el modal
+    addClientEl.on('shown.bs.modal', function() {
+        $('#code').trigger('focus');
+    });
+}
+
+/**
+* Funcion que se encarga de construir un objeto de los datos de un formulario
 * @param form Elemento DOM del formulario
 * @return Objeto
 */
@@ -191,7 +247,6 @@ function getFormData(form){
 /**
 * Funcion que se encarga de mostrar notificacion
 * @param msg Mensaje a mostrar en la notificacion
-* @return Objeto
 */
 function showNotification(msg) {
     $('.toast').children().text(msg);

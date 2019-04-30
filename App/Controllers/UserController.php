@@ -52,7 +52,7 @@ class UserController {
 			'title' => 'Client',
 			'cities' => CityModel::all()->toArray(),
 			'clients' => DB::table('clients')
-						->select('clients.id', 'clients.code','clients.name as name_client','cities.name as name_city')
+						->select('clients.id', 'clients.code','clients.name as name_client','cities.name as name_city','cities.id as city_id')
 						->join('cities','cities.id','=','clients.city_id')
 						->where('clients.user_id', '=', $userId)
 						->get()->toArray()
