@@ -10,3 +10,9 @@ CRUD y manejo de sesiones en Mysql.
 
 1. Descargar 'Latest Snapshot' de composer en https://getcomposer.org/download/
 2. php composer.phar install
+
+# Base de Datos MySQL
+
+1. Ejecutar sentencias SQL que se encuentran en el archico Scripts/scheme.sql
+2. Ejecutar Scripts/loadCities.php para cargar ciudades en la base de datos
+3. Configurar archivo App/Models/Database.php con la conexion correcta a la base de datos
